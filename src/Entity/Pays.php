@@ -17,10 +17,10 @@ class Pays
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, unique:true)]
     private ?string $nom = null;
 
-    #[ORM\Column(length: 3)]
+    #[ORM\Column(length: 3,unique:true)]
     private ?string $code = null;
 
     #[ORM\Column(nullable: true)]
