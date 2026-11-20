@@ -44,10 +44,21 @@ class Pays
     #[ORM\ManyToMany(targetEntity: self::class, mappedBy: 'paysFrontaliers')]
     private Collection $pays;
 
+    /**
+     * @var Collection<int, Langue>
+     */
+    #[ORM\ManyToMany(targetEntity: Langue::class, inversedBy: 'pays')]
+    private Collection $langues;
+
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Continent $continent = null;
+
     public function __construct()
     {
         $this->paysFrontaliers = new ArrayCollection();
         $this->pays = new ArrayCollection();
+        $this->langues = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -162,6 +173,42 @@ class Pays
         if ($this->pays->removeElement($pay)) {
             $pay->removePaysFrontalier($this);
         }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Langue>
+     */
+    public function getLangues(): Collection
+    {
+        return $this->langues;
+    }
+
+    public function addLangue(Langue $langue): static
+    {
+        if (!$this->langues->contains($langue)) {
+            $this->langues->add($langue);
+        }
+
+        return $this;
+    }
+
+    public function removeLangue(Langue $langue): static
+    {
+        $this->langues->removeElement($langue);
+
+        return $this;
+    }
+
+    public function getContinent(): ?Continent
+    {
+        return $this->continent;
+    }
+
+    public function setContinent(?Continent $continent): static
+    {
+        $this->continent = $continent;
 
         return $this;
     }

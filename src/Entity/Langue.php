@@ -4,6 +4,8 @@ namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
 use App\Repository\LangueRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: LangueRepository::class)]
@@ -20,6 +22,17 @@ class Langue
 
     #[ORM\Column(length: 3, unique:true)]
     private ?string $codeIso = null;
+
+    /**
+     * @var Collection<int, Pays>
+     */
+    #[ORM\ManyToMany(targetEntity: Pays::class, mappedBy: 'langues')]
+    private Collection $pays;
+
+    public function __construct()
+    {
+        $this->pays = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -46,6 +59,33 @@ class Langue
     public function setCodeIso(string $codeIso): static
     {
         $this->codeIso = $codeIso;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Pays>
+     */
+    public function getPays(): Collection
+    {
+        return $this->pays;
+    }
+
+    public function addPay(Pays $pay): static
+    {
+        if (!$this->pays->contains($pay)) {
+            $this->pays->add($pay);
+            $pay->addLangue($this);
+        }
+
+        return $this;
+    }
+
+    public function removePay(Pays $pay): static
+    {
+        if ($this->pays->removeElement($pay)) {
+            $pay->removeLangue($this);
+        }
 
         return $this;
     }
