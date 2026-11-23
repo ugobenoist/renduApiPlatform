@@ -23,11 +23,11 @@ class Continent
     #[Groups(['continent:lire'])]
     private ?int $id = null;
 
-
+    // pays:lire => le nom est embarqué quand on lit un pays
     #[ORM\Column(length: 100, unique: true)]
     #[Assert\NotBlank]
     #[Assert\Length(max: 100)]
-    #[Groups(['continent:lire', 'pays:lire'])]
+    #[Groups(['continent:lire', 'continent:ecrire', 'pays:lire'])]
     private ?string $nom = null;
 
     /**
