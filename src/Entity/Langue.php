@@ -7,20 +7,32 @@ use App\Repository\LangueRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: LangueRepository::class)]
-#[ApiResource]
+#[ApiResource(
+    normalizationContext: ['groups' => ['langue:lire']],
+    denormalizationContext: ['groups' => ['langue:ecrire']],
+)]
 class Langue
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['langue:lire'])]
     private ?int $id = null;
 
-    #[ORM\Column(length: 100,unique: true)]
+    #[ORM\Column(length: 100, unique: true)]
+    #[Assert\NotBlank]
+    #[Assert\Length(max: 100)]
+    #[Groups(['langue:lire', 'pays:lire'])]
     private ?string $nom = null;
 
-    #[ORM\Column(length: 3, unique:true)]
+    #[ORM\Column(length: 3, unique: true)]
+    #[Assert\NotBlank]
+    #[Assert\Length(min: 3, max: 3)]
+    #[Groups(['langue:lire'])]
     private ?string $codeIso = null;
 
     /**
