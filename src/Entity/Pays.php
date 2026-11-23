@@ -29,12 +29,12 @@ class Pays
     #[Groups(['pays:lire', 'pays:ecrire'])]
     private ?string $nom = null;
 
-
+    // lecture seule : clé naturelle (alpha-3), jamais modifiable par l'API
     #[ORM\Column(length: 3, unique: true)]
     #[Assert\NotBlank]
     #[Assert\Length(min: 3, max: 3)]
     #[Groups(['pays:lire'])]
-    private ?string $codeAlpha3 = null;
+    private ?string $code = null;
 
     #[ORM\Column(nullable: true)]
     #[Assert\PositiveOrZero]
@@ -44,7 +44,7 @@ class Pays
     #[ORM\Column(nullable: true)]
     #[Assert\Positive]
     #[Groups(['pays:lire', 'pays:ecrire'])]
-    private ?float $superficieKm2 = null;
+    private ?int $superficie = null;
 
     #[ORM\Column(length: 150, nullable: true)]
     #[Assert\Length(max: 150)]
@@ -103,14 +103,14 @@ class Pays
         return $this;
     }
 
-    public function getCodeAlpha3(): ?string
+    public function getCode(): ?string
     {
-        return $this->codeAlpha3;
+        return $this->code;
     }
 
-    public function setCodeAlpha3(string $codeAlpha3): static
+    public function setCode(string $code): static
     {
-        $this->codeAlpha3 = $codeAlpha3;
+        $this->code = $code;
 
         return $this;
     }
@@ -127,14 +127,14 @@ class Pays
         return $this;
     }
 
-    public function getSuperficieKm2(): ?float
+    public function getSuperficie(): ?int
     {
-        return $this->superficieKm2;
+        return $this->superficie;
     }
 
-    public function setSuperficieKm2(?float $superficieKm2): static
+    public function setSuperficie(?int $superficie): static
     {
-        $this->superficieKm2 = $superficieKm2;
+        $this->superficie = $superficie;
 
         return $this;
     }

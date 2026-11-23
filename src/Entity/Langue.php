@@ -26,9 +26,10 @@ class Langue
     #[ORM\Column(length: 100, unique: true)]
     #[Assert\NotBlank]
     #[Assert\Length(max: 100)]
-    #[Groups(['langue:lire', 'pays:lire'])]
+    #[Groups(['langue:lire', 'langue:ecrire', 'pays:lire'])]
     private ?string $nom = null;
 
+    // lecture seule : clé naturelle (ISO 639-3)
     #[ORM\Column(length: 3, unique: true)]
     #[Assert\NotBlank]
     #[Assert\Length(min: 3, max: 3)]
