@@ -83,9 +83,9 @@ class ImportPaysCommand extends Command
 
             // ───── T3 : Normaliser ─────
             $pays->setNom($nom)
-                ->setCodeAlpha3($code)
+                ->setCode($code)
                 ->setPopulation(is_numeric($row['population'] ?? null) ? (int) $row['population'] : null)
-                ->setSuperficieKm2(is_numeric($row['area']['kilometers'] ?? null) ? (float) $row['area']['kilometers'] : null)
+                ->setSuperficie(is_numeric($row['area']['kilometers'] ?? null) ? (float) $row['area']['kilometers'] : null)
                 // ───── T7 : capitale principale (null si aucune) ─────
                 ->setCapitale($this->mainCapital($row['capitals'] ?? []));
 
@@ -185,7 +185,7 @@ class ImportPaysCommand extends Command
     private function findPays(string $code): ?Pays
     {
         return $this->paysCache[$code]
-            ??= $this->paysRepository->findOneBy(['codeAlpha3' => $code]);
+            ??= $this->paysRepository->findOneBy(['code' => $code]);
     }
 
     private function getOrCreateLangue(string $nom, string $codeIso): Langue
