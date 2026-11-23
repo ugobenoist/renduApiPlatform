@@ -7,35 +7,55 @@ use App\Repository\PaysRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: PaysRepository::class)]
-#[ApiResource]
+#[ApiResource(
+    normalizationContext: ['groups' => ['pays:lire']],
+    denormalizationContext: ['groups' => ['pays:ecrire']],
+)]
 class Pays
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['pays:lire'])]
     private ?int $id = null;
 
-    #[ORM\Column(length: 255, unique:true)]
+    #[ORM\Column(length: 255, unique: true)]
+    #[Assert\NotBlank]
+    #[Assert\Length(max: 255)]
+    #[Groups(['pays:lire', 'pays:ecrire'])]
     private ?string $nom = null;
 
-    #[ORM\Column(length: 3,unique:true)]
-    private ?string $code = null;
+
+    #[ORM\Column(length: 3, unique: true)]
+    #[Assert\NotBlank]
+    #[Assert\Length(min: 3, max: 3)]
+    #[Groups(['pays:lire'])]
+    private ?string $codeAlpha3 = null;
 
     #[ORM\Column(nullable: true)]
+    #[Assert\PositiveOrZero]
+    #[Groups(['pays:lire', 'pays:ecrire'])]
     private ?int $population = null;
 
-    #[ORM\Column]
-    private ?int $superficie = null;
+    #[ORM\Column(nullable: true)]
+    #[Assert\Positive]
+    #[Groups(['pays:lire', 'pays:ecrire'])]
+    private ?float $superficieKm2 = null;
 
-    #[ORM\Column(length: 150)]
+    #[ORM\Column(length: 150, nullable: true)]
+    #[Assert\Length(max: 150)]
+    #[Groups(['pays:lire', 'pays:ecrire'])]
     private ?string $capitale = null;
 
     /**
      * @var Collection<int, self>
      */
     #[ORM\ManyToMany(targetEntity: self::class, inversedBy: 'pays')]
+    #[Groups(['pays:lire'])]
     private Collection $paysFrontaliers;
 
     /**
@@ -48,17 +68,22 @@ class Pays
      * @var Collection<int, Langue>
      */
     #[ORM\ManyToMany(targetEntity: Langue::class, inversedBy: 'pays')]
+    #[Groups(['pays:lire'])]
     private Collection $langues;
 
-    #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?Continent $continent = null;
+    /**
+     * @var Collection<int, Continent>
+     */
+    #[ORM\ManyToMany(targetEntity: Continent::class, inversedBy: 'pays')]
+    #[Groups(['pays:lire'])]
+    private Collection $continents;
 
     public function __construct()
     {
         $this->paysFrontaliers = new ArrayCollection();
         $this->pays = new ArrayCollection();
         $this->langues = new ArrayCollection();
+        $this->continents = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -78,14 +103,14 @@ class Pays
         return $this;
     }
 
-    public function getCode(): ?string
+    public function getCodeAlpha3(): ?string
     {
-        return $this->code;
+        return $this->codeAlpha3;
     }
 
-    public function setCode(string $code): static
+    public function setCodeAlpha3(string $codeAlpha3): static
     {
-        $this->code = $code;
+        $this->codeAlpha3 = $codeAlpha3;
 
         return $this;
     }
@@ -102,14 +127,14 @@ class Pays
         return $this;
     }
 
-    public function getSuperficie(): ?int
+    public function getSuperficieKm2(): ?float
     {
-        return $this->superficie;
+        return $this->superficieKm2;
     }
 
-    public function setSuperficie(int $superficie): static
+    public function setSuperficieKm2(?float $superficieKm2): static
     {
-        $this->superficie = $superficie;
+        $this->superficieKm2 = $superficieKm2;
 
         return $this;
     }
@@ -119,7 +144,7 @@ class Pays
         return $this->capitale;
     }
 
-    public function setCapitale(string $capitale): static
+    public function setCapitale(?string $capitale): static
     {
         $this->capitale = $capitale;
 
@@ -201,14 +226,26 @@ class Pays
         return $this;
     }
 
-    public function getContinent(): ?Continent
+    /**
+     * @return Collection<int, Continent>
+     */
+    public function getContinents(): Collection
     {
-        return $this->continent;
+        return $this->continents;
     }
 
-    public function setContinent(?Continent $continent): static
+    public function addContinent(Continent $continent): static
     {
-        $this->continent = $continent;
+        if (!$this->continents->contains($continent)) {
+            $this->continents->add($continent);
+        }
+
+        return $this;
+    }
+
+    public function removeContinent(Continent $continent): static
+    {
+        $this->continents->removeElement($continent);
 
         return $this;
     }
